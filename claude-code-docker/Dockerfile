@@ -1,28 +1,24 @@
-FROM node:20-alpine
+FROM node:20-slim
 
-# Install dependencies
-RUN apk add --no-cache \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
     git \
     python3 \
-    make \
-    g++
+    python3-pip \
+    build-essential \
+    docker.io \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /app
+# Install Claude Code globally
+# Note: May not be publicly available yet
+RUN npm install -g @anthropic-ai/claude-code || \
+    npm install -g claude-code || \
+    echo "⚠️  Claude Code not found - will need manual installation"
 
-# Clone and build n8n-mcp
-RUN git clone https://github.com/czlonkowski/n8n-mcp.git . && \
-    npm install && \
-    npm run build
+# Create directories
+RUN mkdir -p /workspace /root/.config/claude-code
 
-# Expose port for HTTP mode (optional)
-EXPOSE 3000
+WORKDIR /workspace
 
-# Set environment variables
-ENV NODE_ENV=production
-ENV MCP_MODE=stdio
-ENV LOG_LEVEL=info
-
-# Run n8n-mcp
-CMD ["node", "dist/index.js"]
-
+CMD ["tail", "-f", "/dev/null"]
