@@ -1,0 +1,39 @@
+services:
+  n8n-mcp:
+    image: ghcr.io/czlonkowski/n8n-mcp:latest
+    container_name: n8n-mcp
+    environment:
+      - N8N_API_URL=${N8N_API_URL:-http://localhost:5678}
+      - N8N_API_KEY=${N8N_API_KEY:-}
+      - MCP_MODE=stdio
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - DISABLE_CONSOLE_OUTPUT=${DISABLE_CONSOLE_OUTPUT:-true}
+      - N8N_MCP_TELEMETRY_DISABLED=${N8N_MCP_TELEMETRY_DISABLED:-false}
+    stdin_open: true
+    tty: true
+    networks:
+      - claude-n8n-network
+    restart: unless-stopped
+
+  claude-code:
+    build:
+      context: ./claude-code-docker
+      dockerfile: Dockerfile
+    container_name: claude-code
+    working_dir: /workspace
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      - ./workspace:/workspace
+      - ./claude-code-config:/root/.config/claude-code
+      - /var/run/docker.sock:/var/run/docker.sock
+    stdin_open: true
+    tty: true
+    networks:
+      - claude-n8n-network
+    restart: unless-stopped
+    command: tail -f /dev/null
+
+networks:
+  claude-n8n-network:
+    driver: bridge
