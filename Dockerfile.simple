@@ -1,0 +1,13 @@
+# Simpler version using pre-built image
+FROM ghcr.io/czlonkowski/n8n-mcp:latest
+
+# This Dockerfile uses the pre-built image from the repository
+# If you need to build from source, use the main Dockerfile instead
+
+WORKDIR /app
+
+ENV MCP_MODE=stdio
+ENV LOG_LEVEL=info
+
+CMD ["node", "dist/index.js"]
+

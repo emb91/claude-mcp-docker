@@ -1,0 +1,43 @@
+services:
+  n8n-mcp:
+    # n8n MCP server
+    image: ghcr.io/czlonkowski/n8n-mcp:latest
+    container_name: n8n-mcp
+    environment:
+      - N8N_API_URL=${N8N_API_URL:-http://localhost:5678}
+      - N8N_API_KEY=${N8N_API_KEY:-}
+      - MCP_MODE=http
+      - PORT=3000
+      - AUTH_TOKEN=${AUTH_TOKEN:-}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - DISABLE_CONSOLE_OUTPUT=${DISABLE_CONSOLE_OUTPUT:-false}
+      - N8N_MCP_TELEMETRY_DISABLED=${N8N_MCP_TELEMETRY_DISABLED:-false}
+    ports:
+      - "3001:3000"  # Map host port 3001 to container port 3000
+    restart: unless-stopped
+    networks:
+      - claude-n8n-network
+
+  mcp-client:
+    # MCP client that communicates with n8n-mcp
+    image: node:20-alpine
+    container_name: mcp-client
+    working_dir: /app
+    environment:
+      - MCP_SERVER_URL=http://n8n-mcp:3000
+      - AUTH_TOKEN=${AUTH_TOKEN:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    volumes:
+      - ./mcp-client:/app
+    command: sh -c "npm install @modelcontextprotocol/sdk && node /app/client.js"
+    depends_on:
+      - n8n-mcp
+    stdin_open: true
+    tty: true
+    networks:
+      - claude-n8n-network
+    restart: unless-stopped
+
+networks:
+  claude-n8n-network:
+    driver: bridge
