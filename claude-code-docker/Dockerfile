@@ -1,24 +1,12 @@
-FROM node:20-slim
+FROM node:18-alpine
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    python3 \
-    python3-pip \
-    build-essential \
-    docker.io \
-    && rm -rf /var/lib/apt/lists/*
+# Set working directory
+WORKDIR /app
 
-# Install Claude Code globally
-# Note: May not be publicly available yet
-RUN npm install -g @anthropic-ai/claude-code || \
-    npm install -g claude-code || \
-    echo "⚠️  Claude Code not found - will need manual installation"
+# Install Claude Code CLI
+RUN npm install -g @anthropic-ai/claude-code
 
-# Create directories
-RUN mkdir -p /workspace /root/.config/claude-code
+# Copy config into container
+COPY claude_config.json /root/.claude/claude_desktop_config.json
 
-WORKDIR /workspace
-
-CMD ["tail", "-f", "/dev/null"]
+# Default command: op

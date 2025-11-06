@@ -72,10 +72,25 @@ docker-compose logs -f mcp-client
 
 ## Usage
 
+### Running Claude Code in Docker
+
+To run Claude Code in Docker and connect it to the n8n-mcp network:
+
+```bash
+docker run -it \
+  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+  -v $(pwd)/workspace:/workspace \
+  -v $(pwd)/claude-code-config:/root/.config/claude-code \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --network claude-n8n_claude-n8n-network \
+  claude-code \
+  claude  # ← Just "claude", not "claude-code"
+```
+
 ### Accessing n8n-mcp HTTP API
 
 The n8n-mcp server is accessible at:
-- **From host**: `http://localhost:3000`
+- **From host**: `http://localhost:3001`
 - **From other containers**: `http://n8n-mcp:3000`
 
 ### Interacting with the Services
