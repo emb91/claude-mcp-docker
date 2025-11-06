@@ -74,7 +74,19 @@ docker-compose logs -f mcp-client
 
 ### Running Claude Code in Docker
 
-To run Claude Code in Docker and connect it to the n8n-mcp network:
+**Easy way (recommended):** Use the provided script:
+
+```bash
+./run-claude.sh
+```
+
+The script will:
+- Load `ANTHROPIC_API_KEY` from your `.env` file
+- Check if the Docker network exists (starts docker-compose if needed)
+- Build the Claude Code image if it doesn't exist
+- Start Claude Code in Docker with all the correct settings
+
+**Manual way:** Run the Docker command directly:
 
 ```bash
 docker run -it \
